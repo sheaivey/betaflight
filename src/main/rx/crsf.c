@@ -36,6 +36,7 @@
 #include "drivers/time.h"
 
 #include "io/serial.h"
+#include "io/led_strip.h"
 
 #include "rx/rx.h"
 #include "rx/crsf.h"
@@ -150,6 +151,11 @@ STATIC_UNIT_TESTED uint8_t crsfFrameStatus(void)
 {
     if (crsfFrameDone) {
         crsfFrameDone = false;
+
+        if(crsfFrame.frame.type == CRSF_FRAMETYPE_COMMAND) {
+          // ledStripSetOverrideColor(hsvColor_t newHSV); // enable and set override color.
+          // ledStripResetOverrideColor(); // disable override color back to defaults.
+        }
         if (crsfFrame.frame.type == CRSF_FRAMETYPE_RC_CHANNELS_PACKED) {
             // CRC includes type and payload of each frame
             const uint8_t crc = crsfFrameCRC();
