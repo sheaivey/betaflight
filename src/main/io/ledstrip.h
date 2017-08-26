@@ -185,6 +185,9 @@ void reevaluateLedConfig(void);
 void ledStripInit(void);
 void ledStripEnable(void);
 void ledStripUpdate(timeUs_t currentTimeUs);
+// API override functions
+void ledStripSetOverrideColor(hsvColor_t newHSV); // Enables override HSV color
+void ledStripResetOverrideColor(); // disables override color. Back to users default config.
 
 bool setModeColor(ledModeIndex_e modeIndex, int modeColorIndex, int colorIndex);
 

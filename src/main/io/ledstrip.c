@@ -77,6 +77,10 @@ PG_REGISTER_WITH_RESET_FN(ledStripConfig_t, ledStripConfig, PG_LED_STRIP_CONFIG,
 static bool ledStripInitialised = false;
 static bool ledStripEnabled = true;
 
+// LED Strip Color Overlays
+static hsvColor_t overrideColorHSV = {0, 0, 0};
+static bool overrideColorEnabled = false;
+
 static void ledStripDisable(void);
 
 //#define USE_LED_ANIMATION
@@ -505,9 +509,17 @@ static void applyLedFixedLayers()
                     color.v = scaleRange(auxInput, centerPWM, PWM_RANGE_MAX, color.v, nextColor.v);
                 }
        }
+
+        if(overrideColorEnabled) {
+          color.h = overrideColorHSV.h;
+          color.s = overrideColorHSV.s;
+          color.v = overrideColorHSV.v; // We could make this reflect the color.v from the layer.
+        }
+
         color.h = (color.h + hOffset) % (HSV_HUE_MAX + 1);
         setLedHsv(ledIndex, &color);
     }
+
 }
 
 static void applyLedHsv(uint32_t mask, const hsvColor_t *color)
@@ -1167,4 +1179,21 @@ static void ledStripDisable(void)
 
     ws2811UpdateStrip();
 }
+
+// LED Strip API commands
+void ledStripSetOverrideColor(hsvColor_t newHSV){
+    // Enables override HSV color
+    // Resets after power cycle.
+    overrideColorHSV.h = newHSV.h;
+    overrideColorHSV.s = newHSV.s;
+    overrideColorHSV.v = newHSV.v;
+    overrideColorEnabled = true;
+}
+
+void ledStripResetOverrideColor() {
+    // disables override color. Back to users default config.
+    overrideColorHSV = HSV(BLACK);
+    overrideColorEnabled = true;
+}
+
 #endif
